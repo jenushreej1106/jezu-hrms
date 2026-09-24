@@ -1,0 +1,75 @@
+<?php
+
+namespace App\Filament\Resources\Payrolls\Tables;
+
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ViewAction;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
+
+class PayrollsTable
+{
+    public static function configure(Table $table): Table
+    {
+        return $table
+            ->columns([
+                TextColumn::make('employee.name')
+                    ->label('Employee')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('salary_month')
+                    ->label('Salary Month')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('basic_salary')
+                    ->label('Basic Salary')
+                    ->money('INR')
+                    ->sortable(),
+
+                TextColumn::make('allowances')
+                    ->label('Allowances')
+                    ->money('INR')
+                    ->sortable(),
+
+                TextColumn::make('deductions')
+                    ->label('Deductions')
+                    ->money('INR')
+                    ->sortable(),
+
+                TextColumn::make('net_salary')
+                    ->label('Net Salary')
+                    ->money('INR')
+                    ->sortable(),
+
+                TextColumn::make('status')
+                    ->label('Status')
+                    ->badge()
+                    ->sortable(),
+            ])
+            ->filters([
+                SelectFilter::make('status')
+                    ->label('Status')
+                    ->options([
+                        'Pending' => 'Pending',
+                        'Paid' => 'Paid',
+                        'Cancelled' => 'Cancelled',
+                    ]),
+            ])
+            ->recordActions([
+                ViewAction::make(),
+                EditAction::make(),
+                DeleteAction::make(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+}

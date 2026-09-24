@@ -1,0 +1,139 @@
+<?php
+
+namespace App\Filament\Widgets;
+
+use App\Models\Attendance;
+use App\Models\Department;
+use App\Models\Employee;
+use App\Models\Leave;
+use App\Models\Payroll;
+use Filament\Widgets\StatsOverviewWidget as BaseWidget;
+use Filament\Widgets\StatsOverviewWidget\Stat;
+
+class StatsOverview extends BaseWidget
+{
+    protected function getStats(): array
+    {
+        $liquid = [
+            'class' => 'liquid-stat-card',
+        ];
+
+        return [
+            Stat::make('Total Employees', Employee::count())
+                ->description('All employees')
+                ->icon('heroicon-o-users')
+                ->extraAttributes($liquid),
+
+            Stat::make('Total Departments', Department::count())
+                ->description('All departments')
+                ->icon('heroicon-o-building-office')
+                ->extraAttributes($liquid),
+
+            Stat::make('Total Leaves', Leave::count())
+                ->description('Leave requests')
+                ->icon('heroicon-o-calendar-days')
+                ->extraAttributes($liquid),
+
+            Stat::make('Pending Leaves', Leave::where('status', 'Pending')->count())
+                ->description('Waiting for approval')
+                ->icon('heroicon-o-clock')
+                ->extraAttributes($liquid),
+
+            Stat::make('Approved Leaves', Leave::where('status', 'Approved')->count())
+                ->description('Approved requests')
+                ->icon('heroicon-o-check-badge')
+                ->extraAttributes($liquid),
+
+            Stat::make('Rejected Leaves', Leave::where('status', 'Rejected')->count())
+                ->description('Rejected requests')
+                ->icon('heroicon-o-x-circle')
+                ->extraAttributes($liquid),
+
+            Stat::make('Total Payrolls', Payroll::count())
+                ->description('Salary records')
+                ->icon('heroicon-o-banknotes')
+                ->extraAttributes($liquid),
+
+            Stat::make(
+                'Total Payroll Amount',
+                '₹' . number_format(Payroll::sum('net_salary'), 2)
+            )
+                ->description('All payroll net salary')
+                ->icon('heroicon-o-currency-rupee')
+                ->extraAttributes($liquid),
+
+            Stat::make(
+                'Pending Payroll Amount',
+                '₹' . number_format(
+                    Payroll::where('status', 'Pending')->sum('net_salary'),
+                    2
+                )
+            )
+                ->description('Salary waiting for payment')
+                ->icon('heroicon-o-clock')
+                ->extraAttributes($liquid),
+
+            Stat::make(
+                'Paid Payroll Amount',
+                '₹' . number_format(
+                    Payroll::where('status', 'Paid')->sum('net_salary'),
+                    2
+                )
+            )
+                ->description('Salary already paid')
+                ->icon('heroicon-o-check-circle')
+                ->extraAttributes($liquid),
+
+            Stat::make(
+                'Total Attendances',
+                Attendance::count()
+            )
+                ->description('All attendance records')
+                ->icon('heroicon-o-clipboard-document-check')
+                ->extraAttributes($liquid),
+
+            Stat::make(
+                'Present',
+                Attendance::where('status', 'Present')->count()
+            )
+                ->description('Total present records')
+                ->icon('heroicon-o-check-circle')
+                ->extraAttributes($liquid),
+
+            Stat::make(
+                'Absent',
+                Attendance::where('status', 'Absent')->count()
+            )
+                ->description('Total absent records')
+                ->icon('heroicon-o-x-circle')
+                ->extraAttributes($liquid),
+
+            Stat::make(
+                'Half Day',
+                Attendance::where('status', 'Half Day')->count()
+            )
+                ->description('Total half-day records')
+                ->icon('heroicon-o-clock')
+                ->extraAttributes($liquid),
+
+            Stat::make(
+                'Leave',
+                Attendance::where('status', 'Leave')->count()
+            )
+                ->description('Attendance marked as leave')
+                ->icon('heroicon-o-calendar-days')
+                ->extraAttributes($liquid),
+
+            Stat::make(
+                'Present Today',
+                Attendance::whereDate(
+                    'attendance_date',
+                    now()->toDateString()
+                )->where('status', 'Present')->count()
+            )
+                ->description('Employees present today')
+                ->icon('heroicon-o-check-badge')
+                ->extraAttributes($liquid),
+        ];
+    }
+}
